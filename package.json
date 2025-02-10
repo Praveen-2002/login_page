@@ -1,0 +1,23 @@
+{
+  "name": "login",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "client": "cd client && npm start",
+    "server": "cd server && npm start",
+    "Server_install": "cd server && npm install",
+    "client_install": "cd client && npm install",
+    "install_all": "concurrently \"npm run Server_install\" \"npm run client_install\"",
+    "dev": "concurrently \"npm run client\" \"npm run server\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "web-vitals": "^2.1.0"
+  }
+}
