@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import User from "../models/User.js"
-import mongoose from "mongoose"
 import {JWT_SECRET,JWT_EXPIRATION} from "../env.js"
+
 
 export const signup = async (req,res)=>{
     let {name, email, password} = req.headers;
@@ -19,10 +19,11 @@ export const signup = async (req,res)=>{
     try{
         let new_user = User.create([user],session)
         let token = jwt.sign({data: new_user._id},JWT_SECRET,{expiresIn: JWT_EXPIRATION})
-        res.status(201).json({new_user,token})
+        res.cookie("authtoken",token,{httpOnly: true, secure: true, sameSite:"None", maxAge: Date.now() + 1000*60*60*cooikieExpiration(JWT_EXPIRATION)})
+        return res.status(201).json({success:true, message:"User Created"})
     }
     catch(err){
-        res.status(400).json(err)
+        return res.status(400).json(err)
     }
 }
 
@@ -39,20 +40,47 @@ export const login = async (req,res)=>{
     }
 
     let token = jwt.sign({data: existingUser._id},JWT_SECRET,{expiresIn: JWT_EXPIRATION})
-    
-    return res.status(200).json({token})
+
+    res.cookie("authtoken",token,{httpOnly: true, secure: true, sameSite: "None", maxAge: Date.now() + 1000*60*60*cooikieExpiration(JWT_EXPIRATION)})
+    res.status(201).json({success:true, message:"User Logged In"})
+
+    return res.send()
 }
 
-export const tokenValidation = async(req,res,next) =>{
-    if (!req.token){
-        return res.status(401).json({message: "Session Expired"})
+export const tokenValidation = async(req,res) =>{
+    let cookies = parseCookie(req.headers?.cookie)
+    if(!cookies?.authtoken){
+        return res.status(401).json({success: false, message: "User is unautherised"})
     }
-
-    let validate_token = await jwt.verify(req.token,JWT_SECRET);
-    if (!validate_token){
-        return res.status(401).json({message: "Unautherized Access"})
+    let validToken = jwt.verify(cookies.authtoken, JWT_SECRET)
+    if(!validToken){
+        return res.status(401).json({success: false, message: "User is unautherised"})
     }
+    return res.status(200).json({success:true, message: "Welcom Back"})
+}
 
-    req.valid_user = true
-    next()
+// export const tokenValidationMiddleWare = async(req,res,next) =>{
+//     if(!req.cookie.authtoken){
+//         res.status(401).json({success: false, message: "User is unautherised"})
+//     }
+//     req.isUserValid = true
+//     next();
+// }
+
+const cooikieExpiration = (time) =>{
+    let timeInHours = time.split("h")[0]
+    return timeInHours
+}
+
+const parseCookie = (cookies) => {
+    if (!cookies){
+        return {}
+    }
+    let list = cookies.split(";");
+    let Parsedcookies = {}
+    list.forEach(element => {
+        let [key,value] = element.split("=");
+        Parsedcookies[key] = value
+    });
+    return Parsedcookies
 }
