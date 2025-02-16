@@ -50,18 +50,18 @@ export const login = async (req,res)=>{
 export const tokenValidation = async(req,res) =>{
     let cookies = parseCookie(req.headers?.cookie)
     if(!cookies?.authtoken){
-        return res.status(401).json({success: false, message: "User is unautherised"})
+        return res.status(401).json({success: false, message: "User is unauthorized"})
     }
     let validToken = jwt.verify(cookies.authtoken, JWT_SECRET)
     if(!validToken){
-        return res.status(401).json({success: false, message: "User is unautherised"})
+        return res.status(401).json({success: false, message: "User is unauthorized"})
     }
     return res.status(200).json({success:true, message: "Welcom Back"})
 }
 
 // export const tokenValidationMiddleWare = async(req,res,next) =>{
 //     if(!req.cookie.authtoken){
-//         res.status(401).json({success: false, message: "User is unautherised"})
+//         res.status(401).json({success: false, message: "User is unauthorized"})
 //     }
 //     req.isUserValid = true
 //     next();
