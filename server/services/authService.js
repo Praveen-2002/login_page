@@ -17,7 +17,7 @@ export const signup = async (req,res)=>{
         password: hashedPassword
     })
     try{
-        let new_user = User.create([user],session)
+        let new_user = User.create(user)
         let token = jwt.sign({data: new_user._id},JWT_SECRET,{expiresIn: JWT_EXPIRATION})
         res.cookie("authtoken",token,{httpOnly: true, secure: true, sameSite:"None", maxAge: Date.now() + 1000*60*60*cooikieExpiration(JWT_EXPIRATION)})
         return res.status(201).json({success:true, message:"User Created"})
