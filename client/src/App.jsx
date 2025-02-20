@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Loginpage from './components/Login'
 import Signup from './components/Signup'
 import Home from './components/Home'
+import ProtectedRoutes from './components/ProtectedRoutes'
 
 function App() {
 
@@ -12,10 +13,12 @@ function App() {
     <BrowserRouter>
         <Navbar/>
         <Routes>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/home' element={<Home/>}/>
           <Route path='/login' element={<Loginpage/>}/>
           <Route path='/signup' element={<Signup/>}/>
+          <Route element={<ProtectedRoutes/>}> {/* Routes that require validation */}
+            <Route path='/' element={<Home/>}/>
+            <Route path='/home' element={<Home/>}/>
+          </Route>
         </Routes>
     </BrowserRouter>
   )
