@@ -17,7 +17,7 @@ export const signup = async (req,res)=>{
         password: hashedPassword
     })
     try{
-        let new_user = User.create([user],session)
+        let new_user = User.create(user)
         let token = jwt.sign({data: new_user._id},JWT_SECRET,{expiresIn: JWT_EXPIRATION})
         res.cookie("authtoken",token,{httpOnly: true, secure: true, sameSite:"None", maxAge: Date.now() + 1000*60*60*cooikieExpiration(JWT_EXPIRATION)})
         return res.status(201).json({success:true, message:"User Created"})
@@ -52,20 +52,12 @@ export const tokenValidation = async(req,res) =>{
     if(!cookies?.authtoken){
         return res.status(401).json({success: false, message: "User is unauthorized"})
     }
-    let validToken = jwt.verify(cookies.authtoken, JWT_SECRET)
+    let validToken = tokenVerification(cookies.authtoken)
     if(!validToken){
         return res.status(401).json({success: false, message: "User is unauthorized"})
     }
     return res.status(200).json({success:true, message: "Welcom Back"})
 }
-
-// export const tokenValidationMiddleWare = async(req,res,next) =>{
-//     if(!req.cookie.authtoken){
-//         res.status(401).json({success: false, message: "User is unauthorized"})
-//     }
-//     req.isUserValid = true
-//     next();
-// }
 
 const cooikieExpiration = (time) =>{
     let timeInHours = time.split("h")[0]
@@ -83,4 +75,16 @@ const parseCookie = (cookies) => {
         Parsedcookies[key] = value
     });
     return Parsedcookies
+}
+
+const tokenVerification = (token)=>{
+    try{
+        let res = jwt.verify(token, JWT_SECRET)
+        if(res){
+            return true
+        }
+    }
+    catch(err){
+        return false
+    }
 }

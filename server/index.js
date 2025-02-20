@@ -1,6 +1,7 @@
 import DB from "./DB.js"
 import express from "express"
 import authRoutes from "./routes/authRoutes.js"
+import { errorHandler } from "./middleware/errorHandler.js"
 import cors from "cors"
 import {CLIENT_URL} from './env.js'
 
@@ -23,6 +24,8 @@ app.use("/api/auth", authRoutes);
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+app.use(errorHandler)
 
 app.listen(port, async() => {
   console.log(`Example app listening at http://localhost:${port}`);
